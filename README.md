@@ -267,7 +267,7 @@ $ pacstrap -K /mnt base linux linux-firmware
 With base-devel
 
 ```
-$ pacstrap -K /mnt base base-devel linux linux-firmware
+$ pacstrap -K /mnt base base-devel linux linux-firmware git neovim btrfs-progs lvm2
 ```
 
 Load the file table
