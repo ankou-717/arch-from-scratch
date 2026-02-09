@@ -33,7 +33,7 @@ exit
 Enable sshd (should be done by default)
 
 ```
-$ systemctl enable sshd
+$ sudo systemctl enable sshd
 ```
 
 set a password for the current user
