@@ -139,7 +139,7 @@ Create a volume for your swap space. A good size for this is your RAM size + 2GB
 In my case, 64GB of RAM + 2GB = 66G.
 
 ```
-$ lvcreate -n swap -L 66G arch
+$ lvcreate -n swap -L 66G -C y arch
 ```
 
 Next you have a few options depending on your setup
