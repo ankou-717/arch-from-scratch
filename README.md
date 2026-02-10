@@ -542,17 +542,6 @@ $ pacman -S networkmanager
 $ systemctl enable NetworkManager
 ```
 
-### Display Manager
-
-```
-$ pacman -S gnome
-```
-
-```
-$ systemctl enable gdm
-```
-
-
 ### Microcode
 
 For AMD
@@ -572,7 +561,6 @@ $ grub-mkconfig -o /boot/grub/grub.cfg
 $ grub-mkconfig -o /boot/efi/EFI/arch/grub.cfg
 ```
 
-
 ## Reboot
 
 ```
@@ -580,3 +568,95 @@ $ exit
 $ umount -R /mnt
 $ reboot now
 ```
+
+## Post-reboot: Bluetooth
+
+First install the `bluez` and `bluez-utils` packages:
+
+```
+$ pacman -S bluez pipewire-pulse
+```
+
+Then make sure the `btusb` module is loaded.
+
+```
+$ modprobe btusb
+```
+
+Finalt, enable the `bluetooth.service` service
+
+```
+$ systemctl enable --now bluetooth.service
+```
+
+RTFM:
+
+`https://wiki.archlinux.org/title/Bluetooth`
+
+## Post-reboot: Sound
+
+install the `pipewire` and `pipewire-pulse` packages.
+
+```
+$ pacman -S pipewire pipewire-pulse
+```
+
+RTFM:
+
+`https://wiki.archlinux.org/title/Bluetooth`
+
+## Post-reboot: NVIDIA
+
+First check which GPU you are running with
+
+```
+$ lspci | grep 'NVIDIA'
+```
+
+Then check which architecture it is. Depending on the architecture, you should either use the `nvidia-open` package (which can be found in the official repo i.e. managed by pacman), or use the dkms package in the AUR. check it via RTFM: https://wiki.archlinux.org/title/NVIDIA
+
+The former is easy, just
+
+```
+$ pacman -S nvidia-open
+```
+
+For the latter, you should first install the `dkms` and the `linux-headers` packages to enable `dkms` services:
+
+```
+$ pacman -S dkms linux-headers
+```
+
+Then you may either configure a AUR helper e.g. yay: `https://aur.archlinux.org/packages/yay`
+
+```
+$ cd ~/.cache
+$ sudo pacman -S --needed git base-devel
+$ git clone https://aur.archlinux.org/yay.git
+$ cd yay
+$ makepkg -si
+```
+
+and install the dkms package via yay:
+
+```
+$ yay -S nvidia-580xx-dkms
+
+```
+
+or do it manually using `makepkg`, although there is more work invovled.
+
+
+## Post-reboot: ghostty on illogical-impulse (ii)
+
+if using the `ii` dot-files, you might want to replace `kitty` by `ghostty`.
+
+To set the cursor animation with `ghostty` (like `kitty` in `ii`), first clone the shader repo from `https://github.com/KroneCorylus/ghostty-shader-playground.git`
+
+then set the `custom-shader` option in the ghostty configuration file:
+
+```
+$ custom-shader=<path-to-glsl-file>
+```
+restart ghostty and it will work.
+
