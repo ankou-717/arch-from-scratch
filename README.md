@@ -260,15 +260,27 @@ $ mount /dev/nvme0n1p1 /mnt/boot/efi
 
 ## Install arch
 
-```
-$ pacstrap -K /mnt base linux linux-firmware
-```
+Replace `linux` with `linux-hardened` if necessary. Although `linux` will do fine and is better most of the time.
 
-With base-devel
+`git` and `neovim` is needed later anyway so we install it here in advance.
+
+`btrfs-progs` is mandatory, otherwise the `fsck` hook will fail to build during `mkinitcpio`
+
+`lvm2` is needed for the hook so we install it here in advance.
+
+base-devel
 
 ```
 $ pacstrap -K /mnt base base-devel linux linux-firmware git neovim btrfs-progs lvm2
 ```
+
+`mkinitcpio` will likely fail at this point when building the `sd-vconsole` hook due to non-existing `vconsole.conf`. To fix it, echo the following contents to `/etc/vconsole.conf`:
+
+```
+$ echo "#KEYMAP=us" > /etc/vconsole.conf 
+```
+
+The next time it will build normally, so ignore the error for now.
 
 Load the file table
 
@@ -292,10 +304,6 @@ Install a text editor
 $ pacman -S neovim
 ```
 
-```
-$ pacman -S nano
-```
-
 ### Decrypting volumes
 
 Open up mkinitcpio.conf
@@ -304,10 +312,10 @@ Open up mkinitcpio.conf
 $ nvim /etc/mkinitcpio.conf
 ```
 
-add `encrypt` and `lvm2` into the hooks
+add `sd-encrypt` and `lvm2` into the hooks (replace `sd-encrypt` with `encrypt` if using busybox service)
 
 ```
-HOOKS=(... block encrypt lvm2 filesystems fsck)
+HOOKS=(... block sd-encrypt lvm2 filesystems fsck)
 ```
 
 install lvm2
@@ -342,10 +350,14 @@ Copy this to your clipboard
 $ nvim /etc/default/grub
 ```
 
-Add in the following kernel parameters
+Add in the following kernel parameters after `quiet`.
+
+Note that the one shown in the video (cryptdevice=*) is outdated. If used it will lock you out of root.
+
+Use the following:
 
 ```
-root=/dev/mapper/arch-root cryptdevice=UUID=<uuid>:luks_lvm
+rd.luks.name=<UUID>=luks_lvm root=/dev/mapper/arch-root
 ```
 
 ### Keyfile
